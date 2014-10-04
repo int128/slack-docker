@@ -5,9 +5,20 @@ Slack       = require 'node-slack'
 Docker      = require 'dockerode'
 JSONStream  = require 'JSONStream'
 
+class NamedMap
+  constructor: ->
+    @map = {}
+  get: (k, f) ->
+    f @map[k]
+  getAndRemove: (k, f) ->
+    f @map[k]
+    delete @map[k]
+  put: (k, v) ->
+    @map[k] = v
+
 slack       = new Slack process.env.domain, process.env.token
 docker      = new Docker socketPath: '/var/run/docker.sock'
-containers  = {}
+containers  = new NamedMap
 
 docker.version (error, version) ->
   throw error if error
@@ -22,15 +33,14 @@ handle = (event) ->
     when 'start'
       docker.getContainer(event.id).inspect (error, container) ->
         throw error if error
-        containers[event.id] = container
+        containers.put event.id, container
         notify container.Name, "Started #{event.id.substring 0, 8} from #{event.from} at #{container.NetworkSettings?.IPAddress}"
     when 'die', 'kill'
-      container = containers[event.id]
-      notify container.Name, "Stopped #{event.id.substring 0, 8}"
+      containers.get event.id, (container) ->
+        notify container.Name, "Stopped #{event.id.substring 0, 8}"
     when 'destroy'
-      container = containers[event.id]
-      notify container.Name, "Removed #{event.id.substring 0, 8}"
-      delete containers[event.id]
+      containers.getAndRemove event.id, (container) ->
+        notify container.Name, "Removed #{event.id.substring 0, 8}"
 
 notify = (name, text) ->
   slack.send
