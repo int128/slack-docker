@@ -1,16 +1,19 @@
-# Slack integration for Docker events
+# slack-docker
 
-## Setup Slack Incoming WebHook
+Slack integration that notifies Docker events on your host.
 
-Set up [an incoming WebHook](https://my.slack.com/services/new/incoming-webhook) on your team.
 
-## Run
+## How to Run
+
+Set up [an incoming WebHook](https://my.slack.com/services/new/incoming-webhook) and get the token.
+
+Run a container,
 
 ```sh
-domain=DOMAIN token=TOKEN channel=#infra npm start
+docker run -d -v /var/run/docker.sock:/var/run/docker.sock -e domain=DOMAIN -e token=TOKEN -e channel=#infra int128/slack-docker
 ```
 
-### Environment variables
+with following environment variables.
 
 * `domain` is the first part of your .slack.com. (Mandatory)
 * `token` is the token provided on the integration setup page. (Mandatory)
