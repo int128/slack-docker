@@ -1,3 +1,6 @@
+if not process.env.domain or not process.env.token
+  throw 'Run with mandatory environment variables: domain=DOMAIN token=TOKEN'
+
 Slack       = require 'node-slack'
 Docker      = require 'dockerode'
 JSONStream  = require 'JSONStream'
@@ -12,6 +15,9 @@ notify = (id, text) ->
     channel: '#' + process.env.channel || 'general'
     text: text
   .then (->), ((error) -> console.error error)
+
+docker.version (error, version) ->
+  if error then throw error else console.info version
 
 docker.getEvents {}, (error, stream) ->
   stream?.pipe JSONStream.parse().on 'root', (event) ->
