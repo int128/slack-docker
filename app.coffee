@@ -5,8 +5,9 @@ Slack       = require 'node-slack'
 Docker      = require 'dockerode'
 JSONStream  = require 'JSONStream'
 
-slack  = new Slack process.env.domain, process.env.token
-docker = new Docker socketPath: '/var/run/docker.sock'
+slack       = new Slack process.env.domain, process.env.token
+docker      = new Docker socketPath: '/var/run/docker.sock'
+containers  = {}
 
 docker.version (error, version) ->
   throw error if error
@@ -16,20 +17,24 @@ docker.version (error, version) ->
     stream?.pipe JSONStream.parse().on 'root', handle
 
 handle = (event) ->
+  console.info "#{event.time}: #{event.status}: #{event.id} from #{event.from}"
   switch event.status
     when 'start'
-      docker.getContainer(event.id).inspect (error, detail) ->
-        notify event.id, "Started a container #{detail?.Name} from #{event.from} at #{detail?.NetworkSettings.IPAddress}"
-        console.error "#{event.time}: #{error}" if error
+      docker.getContainer(event.id).inspect (error, container) ->
+        throw error if error
+        containers[event.id] = container
+        notify container.Name, "Started #{event.id.substring 0, 8} from #{event.from} at #{container.NetworkSettings?.IPAddress}"
     when 'die', 'kill'
-      notify event.id, "Stopped the container created from #{event.from}"
+      container = containers[event.id]
+      notify container.Name, "Stopped #{event.id.substring 0, 8}"
     when 'destroy'
-      notify event.id, "Removed the container created from #{event.from}"
-  console.info "#{event.time}: #{event.status}: #{event.id} from #{event.from}"
+      container = containers[event.id]
+      notify container.Name, "Removed #{event.id.substring 0, 8}"
+      delete containers[event.id]
 
-notify = (id, text) ->
+notify = (name, text) ->
   slack.send
-    username: "Docker #{id.substring 0, 8}"
+    username: "docker#{name}"
     icon_emoji: ':whale:'
     channel: '#' + process.env.channel || 'general'
     text: text
