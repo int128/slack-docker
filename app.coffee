@@ -9,7 +9,7 @@ notify = (id, text) ->
   slack.send
     username: "Docker #{id.substring 0, 8}"
     icon_emoji: ':whale:'
-    channel: process.env.channel || '#general'
+    channel: '#' + process.env.channel || 'general'
     text: text
   .then (->), ((error) -> console.error error)
 
