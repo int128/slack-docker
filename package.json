@@ -1,0 +1,17 @@
+{
+  "name": "slack-docker",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "author": "int128",
+  "license": "Apache 2.0",
+  "dependencies": {
+    "JSONStream": "^0.9.0",
+    "coffee-script": "^1.8.0",
+    "dockerode": "^2.0.3",
+    "node-slack": "0.0.5"
+  }
+}
