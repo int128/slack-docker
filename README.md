@@ -2,7 +2,7 @@
 
 A Slack integration to notify Docker events.
 
-![slack-docker-0.1.0](https://cloud.githubusercontent.com/assets/321266/4516390/0a61ecb8-4bf4-11e4-9928-5992c2d0a395.png)
+![slack-docker-0.1.1](https://cloud.githubusercontent.com/assets/321266/4773935/0141e0e8-5ba8-11e4-8b35-601e898c58be.png)
 
 ## Run
 
