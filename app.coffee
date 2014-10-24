@@ -34,7 +34,12 @@ handle = (event) ->
       docker.getContainer(event.id).inspect (error, container) ->
         throw error if error
         containers.put event.id, container
-        notify container.Name, "Started #{container.Config.Hostname} from #{event.from} at #{container.NetworkSettings.IPAddress}"
+        notify container.Name, "Started #{container.Config.Hostname}",
+          'Image': event.from
+          'IP Address': container.NetworkSettings.IPAddress
+          'Path': container.Path
+          'Arguments': container.Args
+          'Started at': container.State.StartedAt
     when 'die', 'kill'
       containers.get event.id, (container) ->
         notify container.Name, "Stopped #{container.Config.Hostname}"
@@ -42,11 +47,12 @@ handle = (event) ->
       containers.getAndRemove event.id, (container) ->
         notify container.Name, "Removed #{container.Config.Hostname}"
 
-notify = (name, text) ->
+notify = (name, text, fields) ->
   slack.send
     username: "docker#{name}"
     icon_emoji: ':whale:'
     channel: '#' + process.env.channel || 'general'
     text: text
+    fields: fields
 
 slack.onError = (e) -> console.error e
