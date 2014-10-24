@@ -9,9 +9,9 @@ class NamedMap
   constructor: ->
     @map = {}
   get: (k, f) ->
-    f @map[k]
+    f @map[k] if @map[k]
   getAndRemove: (k, f) ->
-    f @map[k]
+    f @map[k] if @map[k]
     delete @map[k]
   put: (k, v) ->
     @map[k] = v
