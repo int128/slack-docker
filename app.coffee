@@ -1,7 +1,7 @@
-if not process.env.domain or not process.env.token
-  throw 'Run with mandatory environment variables: domain=DOMAIN token=TOKEN'
+if not process.env.webhook
+  throw 'Run with environment variable: webhook=https://hooks.slack.com/services/...'
 
-Slack       = require 'node-slack'
+Slack       = require 'slack-notify'
 Docker      = require 'dockerode'
 JSONStream  = require 'JSONStream'
 
@@ -16,7 +16,7 @@ class NamedMap
   put: (k, v) ->
     @map[k] = v
 
-slack       = new Slack process.env.domain, process.env.token
+slack       = Slack process.env.webhook
 docker      = new Docker socketPath: '/var/run/docker.sock'
 containers  = new NamedMap
 
@@ -48,4 +48,5 @@ notify = (name, text) ->
     icon_emoji: ':whale:'
     channel: '#' + process.env.channel || 'general'
     text: text
-  .then (->), ((error) -> console.error error)
+
+slack.onError = (e) -> console.error e

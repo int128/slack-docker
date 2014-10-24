@@ -11,13 +11,12 @@ Set up [an incoming WebHook integration](https://my.slack.com/services/new/incom
 Run a container
 
 ```sh
-docker run -d -v /var/run/docker.sock:/var/run/docker.sock -e domain=DOMAIN -e token=TOKEN -e channel=infra int128/slack-docker
+docker run -d -v /var/run/docker.sock:/var/run/docker.sock -e webhook=URL -e channel=infra int128/slack-docker
 ```
 
 with following environment variables.
 
-* `domain` is the first part of your .slack.com.
-* `token` is the token provided on the integration page.
+* `webhook` is the Webhook URL like `https://hooks.slack.com/services/...`
 * `channel` is the channel without hash prefix. Default is `general`.
 
 
