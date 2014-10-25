@@ -51,7 +51,7 @@ notify = (name, text, fields) ->
   slack.send
     username: "docker#{name}"
     icon_emoji: ':whale:'
-    channel: '#' + process.env.channel || 'general'
+    channel: ''
     text: text
     fields: fields
 
