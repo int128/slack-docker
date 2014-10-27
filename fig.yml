@@ -1,0 +1,6 @@
+daemon:
+  image: int128/slack-docker
+  volumes:
+    - /var/run/docker.sock:/var/run/docker.sock
+  environment:
+    - webhook=https://hooks.slack.com/services/...

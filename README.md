@@ -14,7 +14,11 @@ Run a container as follows:
 docker run -d -e webhook=URL -v /var/run/docker.sock:/var/run/docker.sock int128/slack-docker
 ```
 
-Replace `URL` with your Webhook URL like `https://hooks.slack.com/services/...`
+or use [Fig](http://www.fig.sh):
+
+```sh
+fig up -d
+```
 
 
 ## Contribution
