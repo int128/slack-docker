@@ -17,6 +17,7 @@ docker run -d -e webhook=URL -v /var/run/docker.sock:/var/run/docker.sock int128
 or use [Fig](http://www.fig.sh):
 
 ```sh
+curl -O https://raw.githubusercontent.com/int128/slack-docker/master/fig.yml
 fig up -d
 ```
 
