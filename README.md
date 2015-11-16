@@ -11,14 +11,12 @@ Set up [an incoming WebHook integration](https://my.slack.com/services/new/incom
 Run a container as follows:
 
 ```sh
+# Docker
 docker run -d -e webhook=URL -v /var/run/docker.sock:/var/run/docker.sock int128/slack-docker
-```
 
-or use [Fig](http://www.fig.sh):
-
-```sh
-curl -O https://raw.githubusercontent.com/int128/slack-docker/master/fig.yml
-fig up -d
+# Docker Compose
+curl -O https://raw.githubusercontent.com/int128/slack-docker/master/docker-compose.yml
+docker-compose up -d
 ```
 
 
