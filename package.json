@@ -1,13 +1,17 @@
 {
   "name": "slack-docker",
   "version": "1.0.0",
-  "description": "",
+  "description": "Slack integration for notifying Docker events",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/int128/slack-docker.git"
+  },
   "main": "app.js",
   "scripts": {
     "start": "node app.js"
   },
   "author": "int128",
-  "license": "Apache 2.0",
+  "license": "Apache-2.0",
   "dependencies": {
     "JSONStream": "^0.9.0",
     "coffee-script": "^1.8.0",
