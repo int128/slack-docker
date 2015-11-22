@@ -16,6 +16,6 @@
     "JSONStream": "^0.9.0",
     "coffee-script": "^1.8.0",
     "dockerode": "^2.0.3",
-    "slack-notify": "^0.1.2"
+    "slack-notify": "^0.1.5"
   }
 }
