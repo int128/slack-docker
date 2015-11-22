@@ -13,7 +13,8 @@
   "author": "int128",
   "license": "Apache-2.0",
   "dependencies": {
-    "JSONStream": "^0.9.0",
+    "JSONStream": "^1.0.7",
+    "event-stream": "^3.3.2",
     "coffee-script": "^1.8.0",
     "dockerode": "^2.2.3",
     "slack-notify": "^0.1.5"

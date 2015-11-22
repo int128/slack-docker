@@ -4,6 +4,7 @@ if not process.env.webhook
 Slack       = require 'slack-notify'
 Docker      = require 'dockerode'
 JSONStream  = require 'JSONStream'
+EventStream = require 'event-stream'
 
 class NamedMap
   constructor: ->
@@ -25,7 +26,7 @@ docker.version (error, version) ->
   console.info version
   docker.getEvents {}, (error, stream) ->
     throw error if error
-    stream?.pipe JSONStream.parse().on 'root', handle
+    stream?.pipe(JSONStream.parse()).pipe(EventStream.map handle)
 
 handle = (event) ->
   console.info "#{event.time}: #{event.status}: #{event.id} from #{event.from}"
