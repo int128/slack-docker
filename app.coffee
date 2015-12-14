@@ -6,19 +6,15 @@ JSONStream  = require 'JSONStream'
 EventStream = require 'event-stream'
 Q           = require 'q'
 
-class NamedMap
-  constructor: ->
-    @map = {}
-  get: (k, f) ->
-    f @map[k] if @map[k]
-  getAndRemove: (k, f) ->
-    f @map[k] if @map[k]
-    delete @map[k]
-  put: (k, v) ->
-    @map[k] = v
 
 docker      = new Docker socketPath: '/var/run/docker.sock'
-containers  = new NamedMap
+
+
+class Containers
+  constructor: -> @_map = {}
+  find: (k, f) -> f @_map[k] if @_map[k]
+  put: (k, v) -> @_map[k] = v
+  remove: (k) -> delete @_map[k]
 
 
 Slack =
@@ -34,12 +30,14 @@ Slack =
 
 
 EventProcessor =
+  _containers: new Containers()
+
   handle: (event) ->
     switch event.status
       when 'start'
         Q.ninvoke docker.getContainer(event.id), 'inspect'
-          .then (container) ->
-            containers.put event.id, container
+          .then (container) =>
+            @_containers.put event.id, container
             Slack.send container.Name, "Started #{container.Config.Hostname}",
               'Image': event.from
               'IP Address': container.NetworkSettings.IPAddress
@@ -47,10 +45,11 @@ EventProcessor =
               'Arguments': container.Args
               'Started at': container.State.StartedAt
       when 'die', 'kill'
-        containers.get event.id, (container) ->
+        @_containers.find event.id, (container) =>
           Slack.send container.Name, "Stopped #{container.Config.Hostname}"
       when 'destroy'
-        containers.getAndRemove event.id, (container) ->
+        @_containers.find event.id, (container) =>
+          @_containers.remove event.id
           Slack.send container.Name, "Removed #{container.Config.Hostname}"
 
 
