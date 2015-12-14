@@ -26,6 +26,11 @@ Slack =
       fields: fields
     .fail (e) -> console.error e
 
+EventFilter =
+  _imageRegExp: new RegExp(process.env.image_regexp)
+  satisfy: (event) ->
+    @_imageRegExp.test event.from
+
 EventProcessor =
   _containers: {}
   _start: (event) ->
@@ -55,8 +60,8 @@ Docker.getVersion().then (version) ->
   console.info version
   Docker.events().then (stream) ->
     stream.pipe EventStream.map (event) ->
-      console.info "#{event.time}: #{event.status}: #{event.id} from #{event.from}"
-      EventProcessor.handle event
+      if EventFilter.satisfy event
+        EventProcessor.handle event
 .fail (e) ->
   console.error e
 
