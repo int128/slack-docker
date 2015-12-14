@@ -26,32 +26,28 @@ Slack =
       fields: fields
     .fail (e) -> console.error e
 
-class Containers
-  constructor: -> @_map = {}
-  find: (k, f) -> f @_map[k] if @_map[k]
-  put: (k, v) -> @_map[k] = v
-  remove: (k) -> delete @_map[k]
-
 EventProcessor =
-  _containers: new Containers()
+  _containers: {}
+  _start: (event) ->
+    Docker.getContainer(event.id).then (container) =>
+      @_containers[event.id] = container
+      Slack.send container.Name, "Started #{container.Config.Hostname}",
+        'Image': event.from
+        'IP Address': container.NetworkSettings.IPAddress
+        'Path': container.Path
+        'Arguments': container.Args
+        'Started at': container.State.StartedAt
+  _kill: (event) ->
+    if container = @_containers[event.id]
+      Slack.send container.Name, "Stopped #{container.Config.Hostname}"
+  _die: (event) ->
+    @_kill event
+  _destroy: (event) ->
+    if container = @_containers[event.id]
+      delete @_containers[event.id]
+      Slack.send container.Name, "Removed #{container.Config.Hostname}"
   handle: (event) ->
-    switch event.status
-      when 'start'
-        Docker.getContainer(event.id).then (container) =>
-          @_containers.put event.id, container
-          Slack.send container.Name, "Started #{container.Config.Hostname}",
-            'Image': event.from
-            'IP Address': container.NetworkSettings.IPAddress
-            'Path': container.Path
-            'Arguments': container.Args
-            'Started at': container.State.StartedAt
-      when 'die', 'kill'
-        @_containers.find event.id, (container) =>
-          Slack.send container.Name, "Stopped #{container.Config.Hostname}"
-      when 'destroy'
-        @_containers.find event.id, (container) =>
-          @_containers.remove event.id
-          Slack.send container.Name, "Removed #{container.Config.Hostname}"
+    @["_#{event.status}"]?.call(@, event)
 
 
 # main
