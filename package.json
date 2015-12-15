@@ -6,9 +6,9 @@
     "type": "git",
     "url": "https://github.com/int128/slack-docker.git"
   },
-  "main": "app.js",
+  "main": "app.coffee",
   "scripts": {
-    "start": "node app.js"
+    "start": "node_modules/coffee-script/bin/coffee app.coffee"
   },
   "author": "int128",
   "license": "Apache-2.0",
