@@ -24,7 +24,11 @@ docker-compose up -d
 By default all events are sent to Slack, but events can be filtered by the environment variable `image_regexp` as follows:
 
 ```sh
-docker run -d -e image_regexp='node:.*' -e webhook=URL -v /var/run/docker.sock:/var/run/docker.sock int128/slack-docker
+# show events only from node
+-e image_regexp='^node:'
+
+# show events but exclude from node
+-e image_regexp='^(?!node:)'
 ```
 
 
