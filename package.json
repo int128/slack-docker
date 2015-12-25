@@ -6,18 +6,16 @@
     "type": "git",
     "url": "https://github.com/int128/slack-docker.git"
   },
-  "main": "app.coffee",
+  "main": "app.js",
   "scripts": {
-    "start": "node_modules/coffee-script/bin/coffee app.coffee"
+    "start": "node app.js"
   },
   "author": "int128",
   "license": "Apache-2.0",
   "dependencies": {
     "JSONStream": "^1.0.7",
-    "coffee-script": "^1.8.0",
     "dockerode": "^2.2.3",
     "event-stream": "^3.3.2",
-    "q": "^1.4.1",
     "slack-notify": "^0.1.5"
   }
 }
