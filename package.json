@@ -13,10 +13,8 @@
   "author": "int128",
   "license": "Apache-2.0",
   "dependencies": {
-    "JSONStream": "^1.0.7",
-    "bluebird": "^3.1.1",
-    "dockerode": "^2.2.3",
-    "event-stream": "^3.3.2",
-    "slack-notify": "^0.1.5"
+    "@slack/client": "^3.14.1",
+    "dockerode": "^2.5.3",
+    "immutable": "^3.8.2"
   }
 }
