@@ -2,65 +2,27 @@ const {Seq} = require('immutable');
 const Docker = require('dockerode');
 const Slack = require('./slack');
 const JSONStream = require('JSONStream');
+const templates = require('./templates');
 
+const imageRegExp = new RegExp(process.env.image_regexp);
 const docker = new Docker();
 const slack = new Slack({
   username: 'docker',
   iconEmoji: ':whale:',
 });
-const imageRegExp = new RegExp(process.env.image_regexp);
-
-function formatAttachmentForEvent(e) {
-  switch (e.status) {
-    case 'start':
-      return {
-        color: 'good',
-        text: 'Started container',
-        fields: [
-          {title: 'Image', value: e.from, short: true},
-          {title: 'Container Name', value: e.Actor.Attributes.name, short: true},
-          {title: 'Container ID', value: e.id},
-        ]
-      };
-
-    case 'kill':
-      return {
-        color: 'warning',
-        text: 'Container is stopped',
-        fields: [
-          {title: 'Image', value: e.from, short: true},
-          {title: 'Container Name', value: e.Actor.Attributes.name, short: true},
-        ]
-      };
-
-    case 'die':
-      return {
-        color: 'warning',
-        text: 'Container is stopped',
-        fields: [
-          {title: 'Image', value: e.from, short: true},
-          {title: 'Container Name', value: e.Actor.Attributes.name, short: true},
-        ]
-      };
-
-    case 'destroy':
-      return {
-        color: 'warning',
-        text: 'Container has been removed',
-        fields: [
-          {title: 'Image', value: e.from, short: true},
-          {title: 'Container Name', value: e.Actor.Attributes.name, short: true},
-        ]
-      };
-  }
-}
 
 async function sendEvent(event) {
   console.info(event);
   if (imageRegExp.test(event.from)) {
-    const attachment = formatAttachmentForEvent(event);
-    if (attachment) {
-      await slack.sendAttachment(attachment);
+    const template = templates[`${event.Type}_${event.Action}`];
+    if (template) {
+      const attachment = template(event);
+      if (attachment) {
+        await slack.send({
+          username: `docker ${event.Type} ${event.Actor.Attributes.name}`,
+          attachments: [attachment],
+        });
+      }
     }
   }
 }
