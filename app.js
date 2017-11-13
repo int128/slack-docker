@@ -8,56 +8,60 @@ const slack = new Slack({
   username: 'docker',
   iconEmoji: ':whale:',
 });
+const imageRegExp = new RegExp(process.env.image_regexp);
 
-async function sendEvent(e) {
+function formatAttachmentForEvent(e) {
   switch (e.status) {
     case 'start':
-      await slack.sendAttachment({
+      return {
         color: 'good',
-        text: 'Container is running',
+        text: 'Started container',
         fields: [
           {title: 'Image', value: e.from, short: true},
           {title: 'Container Name', value: e.Actor.Attributes.name, short: true},
           {title: 'Container ID', value: e.id},
         ]
-      });
-      break;
+      };
 
     case 'kill':
-      await slack.sendAttachment({
+      return {
         color: 'warning',
         text: 'Container is stopped',
         fields: [
           {title: 'Image', value: e.from, short: true},
           {title: 'Container Name', value: e.Actor.Attributes.name, short: true},
         ]
-      });
-      break;
+      };
 
     case 'die':
-      await slack.sendAttachment({
+      return {
         color: 'warning',
         text: 'Container is stopped',
         fields: [
           {title: 'Image', value: e.from, short: true},
           {title: 'Container Name', value: e.Actor.Attributes.name, short: true},
         ]
-      });
-      break;
+      };
 
     case 'destroy':
-      await slack.sendAttachment({
+      return {
         color: 'warning',
         text: 'Container has been removed',
         fields: [
           {title: 'Image', value: e.from, short: true},
           {title: 'Container Name', value: e.Actor.Attributes.name, short: true},
         ]
-      });
-      break;
+      };
+  }
+}
 
-    default:
-      console.debug(e);
+async function sendEvent(event) {
+  console.info(event);
+  if (imageRegExp.test(event.from)) {
+    const attachment = formatAttachmentForEvent(event);
+    if (attachment) {
+      await slack.sendAttachment(attachment);
+    }
   }
 }
 
