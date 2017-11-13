@@ -10,24 +10,54 @@ const slack = new Slack({
 });
 
 async function sendEvent(e) {
-  console.info(e);
   switch (e.status) {
     case 'start':
       await slack.sendAttachment({
         color: 'good',
         text: 'Container is running',
         fields: [
-          {title: 'Image', value: e.from},
-          {title: 'Container Name', value: e.Actor.Attributes.name},
+          {title: 'Image', value: e.from, short: true},
+          {title: 'Container Name', value: e.Actor.Attributes.name, short: true},
           {title: 'Container ID', value: e.id},
         ]
       });
       break;
 
-    // TODO
     case 'kill':
+      await slack.sendAttachment({
+        color: 'warning',
+        text: 'Container is stopped',
+        fields: [
+          {title: 'Image', value: e.from, short: true},
+          {title: 'Container Name', value: e.Actor.Attributes.name, short: true},
+        ]
+      });
+      break;
+
     case 'die':
+      await slack.sendAttachment({
+        color: 'warning',
+        text: 'Container is stopped',
+        fields: [
+          {title: 'Image', value: e.from, short: true},
+          {title: 'Container Name', value: e.Actor.Attributes.name, short: true},
+        ]
+      });
+      break;
+
     case 'destroy':
+      await slack.sendAttachment({
+        color: 'warning',
+        text: 'Container has been removed',
+        fields: [
+          {title: 'Image', value: e.from, short: true},
+          {title: 'Container Name', value: e.Actor.Attributes.name, short: true},
+        ]
+      });
+      break;
+
+    default:
+      console.debug(e);
   }
 }
 
