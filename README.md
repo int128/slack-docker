@@ -19,6 +19,24 @@ curl -O https://raw.githubusercontent.com/int128/slack-docker/master/docker-comp
 docker-compose up -d
 ```
 
+### Include docker hostname in the messages
+
+If you run standalone docker hosts you'll probably find usefull include the `HOSTNAME` in the 
+messages posted to slack. Run the container as follows:
+
+```sh
+# Docker
+docker run --net=host --env include_hostname=1 -d -e webhook=URL -v /var/run/docker.sock:/var/run/docker.sock int128/slack-docker
+```
+
+or set the variable explicitly
+
+```sh
+# Docker
+docker run --env HOSTNAME=${HOSTNAME} --env include_hostname=1 -d -e webhook=URL -v /var/run/docker.sock:/var/run/docker.sock int128/slack-docker
+```
+
+
 ### Filter events by image name
 
 By default all events are sent to Slack, but events can be filtered by the environment variable `image_regexp` as follows:

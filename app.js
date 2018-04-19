@@ -3,7 +3,6 @@ const Docker = require('dockerode');
 const Slack = require('./slack');
 const JSONStream = require('JSONStream');
 const templates = require('./templates');
-
 const imageRegExp = new RegExp(process.env.image_regexp);
 const docker = new Docker();
 const slack = new Slack({
@@ -13,13 +12,17 @@ const slack = new Slack({
 
 async function sendEvent(event) {
   console.info(event);
+  hostname_string = '';
+  if (process.env.include_hostname) {
+    hostname_string = '@ ' + process.env.HOSTNAME
+  }
   if (imageRegExp.test(event.from)) {
     const template = templates[`${event.Type}_${event.Action}`];
     if (template) {
       const attachment = template(event);
       if (attachment) {
         await slack.send({
-          username: `docker ${event.Type} ${event.Actor.Attributes.name}`,
+          username: `docker ${event.Type} ${event.Actor.Attributes.name} ${hostname_string}`,
           attachments: [attachment],
         });
       }
