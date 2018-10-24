@@ -4,4 +4,3 @@ daemon:
     - /var/run/docker.sock:/var/run/docker.sock
   environment:
     - webhook=https://hooks.slack.com/services/...
-    #- include_hostname=1
