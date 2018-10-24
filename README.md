@@ -1,55 +1,51 @@
-# slack-docker
+# slack-docker [![CircleCI](https://circleci.com/gh/int128/slack-docker.svg?style=shield)](https://circleci.com/gh/int128/slack-docker)
 
-A Slack integration to notify Docker events.
+A Slack integration to notify [Docker events](https://docs.docker.com/engine/reference/commandline/events/) written in Go.
 
 <img width="623" alt="slack-docker-screenshot" src="https://user-images.githubusercontent.com/321266/32720381-bc847924-c8a6-11e7-8348-fa7e03e82939.png">
 
-## How to Run
 
-Set up [an incoming WebHook integration](https://my.slack.com/services/new/incoming-webhook) and get the Webhook URL.
+## Getting Started
 
-Run a container as follows:
+Setup [an Incoming WebHook](https://my.slack.com/services/new/incoming-webhook) on your Slack workspace and get the WebHook URL.
+
+Run slack-docker as follows:
 
 ```sh
+# Standalone
+./slack-docker --webhook=https://hooks.slack.com/services/...
+
 # Docker
-docker run -d -e webhook=URL -v /var/run/docker.sock:/var/run/docker.sock int128/slack-docker
+docker run -d -e webhook=https://hooks.slack.com/services/... -v /var/run/docker.sock:/var/run/docker.sock int128/slack-docker
 
 # Docker Compose
 curl -O https://raw.githubusercontent.com/int128/slack-docker/master/docker-compose.yml
 docker-compose up -d
 ```
 
-### Include docker hostname in the messages
 
-If you run standalone docker hosts you'll probably find usefull include the `HOSTNAME` in the 
-messages posted to slack. Run the container as follows:
+## Configuration
 
-```sh
-# Docker
-docker run --net=host --env include_hostname=1 -d -e webhook=URL -v /var/run/docker.sock:/var/run/docker.sock int128/slack-docker
+It supports the following options and environment variables:
+
 ```
+Application Options:
+      --webhook=      Slack Incoming WebHook URL [$webhook]
+      --image-regexp= Filter events by image name (default to all) [$image_regexp]
 
-or set the variable explicitly
-
-```sh
-# Docker
-docker run --env HOSTNAME=${HOSTNAME} --env include_hostname=1 -d -e webhook=URL -v /var/run/docker.sock:/var/run/docker.sock int128/slack-docker
+Help Options:
+  -h, --help          Show this help message
 ```
 
 
 ### Filter events by image name
 
-By default all events are sent to Slack, but events can be filtered by the environment variable `image_regexp` as follows:
-
 ```sh
-# show events only from node
--e image_regexp='^node:'
-
-# show events but exclude from node
--e image_regexp='^(?!node:)'
+webhook=https://hooks.slack.com/services/... image_regexp='^alpine$' ./slack-docker
 ```
 
 
 ## Contribution
 
-Please let me know an issue or pull request.
+This is an open source software licensed under Apache-2.0.
+Feel free to open issues or pull requests.
