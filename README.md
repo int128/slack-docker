@@ -2,7 +2,7 @@
 
 A Slack integration to notify [Docker events](https://docs.docker.com/engine/reference/commandline/events/) written in Go.
 
-<img width="623" alt="slack-docker-screenshot" src="https://user-images.githubusercontent.com/321266/32720381-bc847924-c8a6-11e7-8348-fa7e03e82939.png">
+<img width="596" alt="slack-docker-screenshot" src="https://user-images.githubusercontent.com/321266/47410763-c7682d80-d7a1-11e8-8f05-c80786152604.png">
 
 
 ## Getting Started
