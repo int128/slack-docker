@@ -10,13 +10,23 @@ import (
 	"github.com/jessevdk/go-flags"
 	"io"
 	"log"
+	"regexp"
 )
 
 type options struct {
-	Webhook string `long:"webhook" env:"webhook" description:"Slack Webhook URL" required:"1"`
+	Webhook           string `long:"webhook" env:"webhook" description:"Slack Incoming WebHook URL" required:"1"`
+	DockerImageRegexp string `long:"image-regexp" env:"image_regexp" description:"Filter events by image name (default to all)"`
 }
 
 func (o *options) Run(ctx context.Context) error {
+	var eventFilter formatter.EventFilter
+	if o.DockerImageRegexp != "" {
+		r, err := regexp.Compile(o.DockerImageRegexp)
+		if err != nil {
+			return fmt.Errorf("Invalid image-regexp: %s", err)
+		}
+		eventFilter.ImageRegexp = r
+	}
 	docker, err := client.NewEnvClient()
 	if err != nil {
 		return fmt.Errorf("Could not create a Docker client: %s", err)
@@ -24,7 +34,7 @@ func (o *options) Run(ctx context.Context) error {
 	if err := o.showVersion(ctx, docker); err != nil {
 		return err
 	}
-	if err := o.showEvents(ctx, docker); err != nil {
+	if err := o.showEvents(ctx, docker, eventFilter); err != nil {
 		return err
 	}
 	return nil
@@ -42,13 +52,13 @@ func (o *options) showVersion(ctx context.Context, docker *client.Client) error 
 	return nil
 }
 
-func (o *options) showEvents(ctx context.Context, docker *client.Client) error {
+func (o *options) showEvents(ctx context.Context, docker *client.Client, filter formatter.EventFilter) error {
 	msgCh, errCh := docker.Events(ctx, types.EventsOptions{})
 	for {
 		select {
 		case msg := <-msgCh:
 			log.Printf("Event %+v", msg)
-			m := formatter.Event(msg)
+			m := formatter.Event(msg, filter)
 			if m != nil {
 				if err := slack.Send(o.Webhook, m); err != nil {
 					log.Printf("Error while sending a message to Slack: %s", err)

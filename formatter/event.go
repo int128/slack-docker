@@ -4,14 +4,34 @@ import (
 	"fmt"
 	"github.com/docker/docker/api/types/events"
 	"github.com/int128/slack-docker/slack"
+	"regexp"
 )
+
+// EventFilter represents a filter for events.
+type EventFilter struct {
+	ImageRegexp *regexp.Regexp
+}
+
+// Match returns true if the event satisfies the filter.
+func (filter *EventFilter) Match(e events.Message) bool {
+	if filter.ImageRegexp != nil {
+		switch e.Type {
+		case "container":
+			return filter.ImageRegexp.MatchString(e.Actor.Attributes["image"])
+		}
+	}
+	return true
+}
 
 // Event returns a message for the event.
 // It returns a message only for some events and may return nil.
-func Event(e events.Message) *slack.Message {
+func Event(e events.Message, filter EventFilter) *slack.Message {
+	if !filter.Match(e) {
+		return nil
+	}
 	switch e.Type {
 	case "container":
-		return containerEvent(e)
+		return containerEvent(e, filter)
 	case "image":
 		return imageEvent(e)
 	case "volume":
@@ -22,7 +42,7 @@ func Event(e events.Message) *slack.Message {
 	return nil
 }
 
-func containerEvent(e events.Message) *slack.Message {
+func containerEvent(e events.Message, filter EventFilter) *slack.Message {
 	switch {
 	case e.Action == "start":
 		return &slack.Message{
