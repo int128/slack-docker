@@ -9,37 +9,44 @@ import (
 // Event returns a message for the event.
 // It returns a message only for some events and may return nil.
 func Event(e events.Message) *slack.Message {
+	switch e.Type {
+	case "container":
+		return containerEvent(e)
+	case "image":
+		return imageEvent(e)
+	case "volume":
+		return volumeEvent(e)
+	case "network":
+		return networkEvent(e)
+	}
+	return nil
+}
+
+func containerEvent(e events.Message) *slack.Message {
 	switch {
-	case e.Type == "container" && e.Action == "start":
+	case e.Action == "start":
 		return &slack.Message{
 			Username:  username,
 			IconEmoji: iconEmoji,
 			Attachments: slack.Attachments{
 				slack.Attachment{
-					Text:     fmt.Sprintf("Started container `%s`", e.Actor.Attributes["name"]),
-					Color:    "good",
-					MrkdwnIn: []string{"text"},
-					Fields: slack.AttachmentFields{
-						slack.AttachmentField{
-							Short: true,
-							Title: "Image",
-							Value: e.Actor.Attributes["image"],
-						},
-						slack.AttachmentField{
-							Title: "Container ID",
-							Value: e.Actor.ID,
-						},
-					},
+					Title:     fmt.Sprintf(":package: Started %s", e.Actor.Attributes["name"]),
+					Text:      fmt.Sprintf("Container `%s` has been started with the image `%s`.", e.Actor.Attributes["name"], e.Actor.Attributes["image"]),
+					Footer:    e.Actor.ID,
+					Color:     "good",
+					Timestamp: e.Time,
+					MrkdwnIn:  []string{"text"},
 				},
 			},
 		}
-	case e.Type == "container" && e.Action == "kill":
+	case e.Action == "kill":
 		fallthrough
-	case e.Type == "container" && e.Action == "die":
+	case e.Action == "die":
 		var color string
-		if e.Actor.Attributes["exitCode"] == "0" {
+		switch e.Actor.Attributes["exitCode"] {
+		case "0":
 			color = "good"
-		} else {
+		default:
 			color = "danger"
 		}
 		return &slack.Message{
@@ -47,72 +54,135 @@ func Event(e events.Message) *slack.Message {
 			IconEmoji: iconEmoji,
 			Attachments: slack.Attachments{
 				slack.Attachment{
-					Text:     fmt.Sprintf("Stopped container `%s`", e.Actor.Attributes["name"]),
-					Color:    color,
-					MrkdwnIn: []string{"text"},
-					Fields: slack.AttachmentFields{
-						slack.AttachmentField{
-							Short: true,
-							Title: "Image",
-							Value: e.Actor.Attributes["image"],
-						},
-						slack.AttachmentField{
-							Short: true,
-							Title: "Exit Code",
-							Value: e.Actor.Attributes["exitCode"],
-						},
-						slack.AttachmentField{
-							Title: "Container ID",
-							Value: e.Actor.ID,
-						},
-					},
+					Title:     fmt.Sprintf(":package: Stopped %s", e.Actor.Attributes["name"]),
+					Text:      fmt.Sprintf("Container `%s` has been terminated with exit code `%s`.", e.Actor.Attributes["name"], e.Actor.Attributes["exitCode"]),
+					Footer:    e.Actor.ID,
+					Color:     color,
+					Timestamp: e.Time,
+					MrkdwnIn:  []string{"text"},
 				},
 			},
 		}
-	case e.Type == "container" && e.Action == "destroy":
+	case e.Action == "destroy":
 		return &slack.Message{
 			Username:  username,
 			IconEmoji: iconEmoji,
 			Attachments: slack.Attachments{
 				slack.Attachment{
-					Text:     fmt.Sprintf("Destroyed container `%s`", e.Actor.Attributes["name"]),
-					Color:    "warning",
-					MrkdwnIn: []string{"text"},
-					Fields: slack.AttachmentFields{
-						slack.AttachmentField{
-							Short: true,
-							Title: "Image",
-							Value: e.Actor.Attributes["image"],
-						},
-						slack.AttachmentField{
-							Title: "Container ID",
-							Value: e.Actor.ID,
-						},
-					},
+					Title:     fmt.Sprintf(":package: Removed %s", e.Actor.Attributes["name"]),
+					Text:      fmt.Sprintf("Container `%s` has been removed.", e.Actor.Attributes["name"]),
+					Footer:    e.Actor.ID,
+					Color:     "warning",
+					Timestamp: e.Time,
+					MrkdwnIn:  []string{"text"},
 				},
 			},
 		}
-	case e.Type == "network" && e.Action == "create":
+	}
+	return nil
+}
+
+func imageEvent(e events.Message) *slack.Message {
+	switch {
+	case e.Action == "tag":
 		return &slack.Message{
 			Username:  username,
 			IconEmoji: iconEmoji,
 			Attachments: slack.Attachments{
 				slack.Attachment{
-					Text:     fmt.Sprintf("Created network `%s`", e.Actor.Attributes["name"]),
-					Color:    "good",
-					MrkdwnIn: []string{"text"},
+					Title:     fmt.Sprintf(":label: Tagged %s", e.Actor.Attributes["name"]),
+					Text:      fmt.Sprintf("Image `%s` has been tagged.", e.Actor.Attributes["name"]),
+					Footer:    e.Actor.ID,
+					Color:     "good",
+					Timestamp: e.Time,
+					MrkdwnIn:  []string{"text"},
 				},
 			},
 		}
-	case e.Type == "network" && e.Action == "destroy":
+	case e.Action == "delete":
 		return &slack.Message{
 			Username:  username,
 			IconEmoji: iconEmoji,
 			Attachments: slack.Attachments{
 				slack.Attachment{
-					Text:     fmt.Sprintf("Destroyed network `%s`", e.Actor.Attributes["name"]),
-					Color:    "warning",
-					MrkdwnIn: []string{"text"},
+					Title:     fmt.Sprintf(":label: Deleted %s", e.Actor.Attributes["name"]),
+					Text:      fmt.Sprintf("Image `%s` has been deleted.", e.Actor.Attributes["name"]),
+					Footer:    e.Actor.ID,
+					Color:     "good",
+					Timestamp: e.Time,
+					MrkdwnIn:  []string{"text"},
+				},
+			},
+		}
+	}
+	return nil
+}
+
+func volumeEvent(e events.Message) *slack.Message {
+	switch {
+	case e.Action == "create":
+		return &slack.Message{
+			Username:  username,
+			IconEmoji: iconEmoji,
+			Attachments: slack.Attachments{
+				slack.Attachment{
+					Title:     fmt.Sprintf(":oil_drum: Started %s", e.Actor.Attributes["name"]),
+					Text:      fmt.Sprintf("Volume `%s` has been created.", e.Actor.Attributes["name"]),
+					Footer:    e.Actor.ID,
+					Color:     "good",
+					Timestamp: e.Time,
+					MrkdwnIn:  []string{"text"},
+				},
+			},
+		}
+	case e.Action == "destroy":
+		return &slack.Message{
+			Username:  username,
+			IconEmoji: iconEmoji,
+			Attachments: slack.Attachments{
+				slack.Attachment{
+					Title:     fmt.Sprintf(":oil_drum: Removed %s", e.Actor.Attributes["name"]),
+					Text:      fmt.Sprintf("Volume `%s` has been removed.", e.Actor.Attributes["name"]),
+					Footer:    e.Actor.ID,
+					Color:     "warning",
+					Timestamp: e.Time,
+					MrkdwnIn:  []string{"text"},
+				},
+			},
+		}
+	}
+	return nil
+}
+
+func networkEvent(e events.Message) *slack.Message {
+	switch {
+	case e.Action == "create":
+		return &slack.Message{
+			Username:  username,
+			IconEmoji: iconEmoji,
+			Attachments: slack.Attachments{
+				slack.Attachment{
+					Title:     fmt.Sprintf(":link: Started %s", e.Actor.Attributes["name"]),
+					Text:      fmt.Sprintf("Network `%s` has been created.", e.Actor.Attributes["name"]),
+					Footer:    e.Actor.ID,
+					Color:     "good",
+					Timestamp: e.Time,
+					MrkdwnIn:  []string{"text"},
+				},
+			},
+		}
+	case e.Action == "destroy":
+		return &slack.Message{
+			Username:  username,
+			IconEmoji: iconEmoji,
+			Attachments: slack.Attachments{
+				slack.Attachment{
+					Title:     fmt.Sprintf(":link: Removed %s", e.Actor.Attributes["name"]),
+					Text:      fmt.Sprintf("Network `%s` has been removed.", e.Actor.Attributes["name"]),
+					Footer:    e.Actor.ID,
+					Color:     "warning",
+					Timestamp: e.Time,
+					MrkdwnIn:  []string{"text"},
 				},
 			},
 		}
