@@ -1,0 +1,14 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: circleci/golang:1.11.1
+    environment:
+      GO111MODULE: "on"
+    working_directory: /go/src/github.com/int128/slack-docker
+    steps:
+      - checkout
+      - run: go get -u golang.org/x/lint/golint
+      - run: golint
+      - run: go build -v
+      - run: go test -v ./...

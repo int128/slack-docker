@@ -1,4 +1,4 @@
-# slack-docker
+# slack-docker [![CircleCI](https://circleci.com/gh/int128/slack-docker.svg?style=shield)](https://circleci.com/gh/int128/slack-docker)
 
 A Slack integration to notify [Docker events](https://docs.docker.com/engine/reference/commandline/events/) written in Go.
 
