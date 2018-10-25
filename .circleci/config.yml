@@ -8,7 +8,36 @@ jobs:
     working_directory: /go/src/github.com/int128/slack-docker
     steps:
       - checkout
-      - run: go get -u golang.org/x/lint/golint
-      - run: golint
+      - run: go get golang.org/x/lint/golint
+      - run: golint -set_exit_status ./...
+      - run: go vet
       - run: go build -v
       - run: go test -v ./...
+
+  release:
+    docker:
+      - image: circleci/golang:1.11.1
+    environment:
+      GO111MODULE: "on"
+    working_directory: /go/src/github.com/int128/slack-docker
+    steps:
+      - checkout
+      - run: go vet
+      - run: curl -sL https://git.io/goreleaser | bash
+
+workflows:
+  version: 2
+  all:
+    jobs:
+      - build:
+          filters:
+            tags:
+              only: /.*/
+      - release:
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /.*/
+          requires:
+            - build
