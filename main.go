@@ -87,5 +87,7 @@ func main() {
 	if len(args) > 0 {
 		log.Fatalf("Too many arguments")
 	}
-	o.Run(context.Background())
+	if err := o.Run(context.Background()); err != nil {
+		log.Fatalf("Error: %s", err)
+	}
 }
