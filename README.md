@@ -1,6 +1,6 @@
 # slack-docker [![CircleCI](https://circleci.com/gh/int128/slack-docker.svg?style=shield)](https://circleci.com/gh/int128/slack-docker)
 
-A Slack integration to notify [Docker events](https://docs.docker.com/engine/reference/commandline/events/) written in Go.
+A Slack integration to notify [Docker events](https://docs.docker.com/engine/reference/commandline/events/).
 
 <img width="596" alt="slack-docker-screenshot" src="https://user-images.githubusercontent.com/321266/47410763-c7682d80-d7a1-11e8-8f05-c80786152604.png">
 
@@ -9,14 +9,24 @@ A Slack integration to notify [Docker events](https://docs.docker.com/engine/ref
 
 Setup [an Incoming WebHook](https://my.slack.com/services/new/incoming-webhook) on your Slack workspace and get the WebHook URL.
 
-Run slack-docker as follows:
+Install slack-docker by brew tap or from the [releases](https://github.com/int128/slack-docker/releases).
 
 ```sh
-# Standalone
-./slack-docker --webhook=https://hooks.slack.com/services/...
+brew tap int128/slack-docker
+brew install slack-docker
+```
 
+Run the command with the WebHook URL.
+
+```sh
+slack-docker --webhook=https://hooks.slack.com/services/...
+```
+
+You can run on Docker or Docker Compose as well.
+
+```
 # Docker
-docker run -d -e webhook=https://hooks.slack.com/services/... -v /var/run/docker.sock:/var/run/docker.sock int128/slack-docker
+docker run -d -e webhook=https://hooks.slack.com/services/... -h "$(hostname)" -v /var/run/docker.sock:/var/run/docker.sock int128/slack-docker
 
 # Docker Compose
 curl -O https://raw.githubusercontent.com/int128/slack-docker/master/docker-compose.yml
