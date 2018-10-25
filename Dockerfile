@@ -8,6 +8,5 @@ RUN go install -v
 FROM alpine
 RUN apk update && apk add --no-cache ca-certificates
 EXPOSE 3000
-USER daemon
 COPY --from=builder /go/bin/slack-docker /
 CMD ["/slack-docker"]
