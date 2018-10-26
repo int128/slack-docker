@@ -3,7 +3,7 @@ package formatter
 import (
 	"fmt"
 	"github.com/docker/docker/api/types/events"
-	"github.com/int128/slack-docker/slack"
+	"github.com/int128/slack"
 	"regexp"
 )
 

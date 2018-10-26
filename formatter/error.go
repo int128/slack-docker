@@ -2,7 +2,7 @@ package formatter
 
 import (
 	"fmt"
-	"github.com/int128/slack-docker/slack"
+	"github.com/int128/slack"
 )
 
 // Error returns a message for the error.

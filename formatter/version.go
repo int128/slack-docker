@@ -3,7 +3,7 @@ package formatter
 import (
 	"fmt"
 	"github.com/docker/docker/api/types"
-	"github.com/int128/slack-docker/slack"
+	"github.com/int128/slack"
 )
 
 // Version returns a message for the Docker version.
