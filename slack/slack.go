@@ -52,18 +52,27 @@ type AttachmentField struct {
 // AttachmentFields is an array of AttachmentField.
 type AttachmentFields []AttachmentField
 
-// Send sends the message to the incoming webhook.
-func Send(webhookURL string, message *Message) error {
-	b := new(bytes.Buffer)
-	json.NewEncoder(b).Encode(message)
-	resp, err := http.Post(webhookURL, "application/json", b)
+// Send sends the message to Slack via Incomming WebHook API.
+// It returns an error if the API did not return 2xx status.
+func Send(webHookURL string, message *Message) error {
+	if message == nil {
+		return fmt.Errorf("message is nil")
+	}
+	var b bytes.Buffer
+	if err := json.NewEncoder(&b).Encode(message); err != nil {
+		return fmt.Errorf("Could not encode JSON: %s", err)
+	}
+	resp, err := http.Post(webHookURL, "application/json", &b)
 	if err != nil {
-		return err
+		return fmt.Errorf("Could not send the request: %s", err)
 	}
 	defer resp.Body.Close()
 	if resp.StatusCode >= 300 {
-		b, _ := ioutil.ReadAll(resp.Body)
-		return fmt.Errorf("API error: %d %s: %s", resp.StatusCode, resp.Status, string(b))
+		b, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			return fmt.Errorf("Slack API returned %s (could not read body: %s)", resp.Status, err)
+		}
+		return fmt.Errorf("Slack API returned %s: %s", resp.Status, string(b))
 	}
 	return nil
 }
