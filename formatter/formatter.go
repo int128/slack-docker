@@ -14,6 +14,7 @@ func init() {
 	hostname, err := os.Hostname()
 	if err != nil {
 		log.Printf("Skip to set Slack username with hostname: %s", err)
+	} else {
+		username = fmt.Sprintf("docker@%s", hostname)
 	}
-	username = fmt.Sprintf("docker@%s", hostname)
 }
