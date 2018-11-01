@@ -1,7 +1,6 @@
 FROM golang:1.11.1-alpine AS builder
-WORKDIR /go/src/github.com/int128/slack-docker
 RUN apk update && apk add --no-cache git gcc musl-dev
-ENV GO111MODULE on
+WORKDIR /build
 COPY . .
 RUN go install -v
 
