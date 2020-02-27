@@ -1,4 +1,6 @@
-module github.com/int128/slack-docker
+module github.com/invers-gmbh/slack-docker
+
+go 1.14
 
 require (
 	github.com/docker/distribution v2.6.2+incompatible // indirect

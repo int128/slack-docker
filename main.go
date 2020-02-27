@@ -6,7 +6,7 @@ import (
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/client"
 	"github.com/int128/slack"
-	"github.com/int128/slack-docker/formatter"
+	"github.com/invers-gmbh/slack-docker/formatter"
 	"github.com/jessevdk/go-flags"
 	"io"
 	"log"
@@ -14,8 +14,11 @@ import (
 )
 
 type options struct {
-	Webhook           string `long:"webhook" env:"webhook" description:"Slack Incoming WebHook URL" required:"1"`
-	DockerImageRegexp string `long:"image-regexp" env:"image_regexp" description:"Filter events by image name (default to all)"`
+	Webhook             string `long:"webhook" env:"webhook" description:"Slack Incoming WebHook URL" required:"1"`
+	DockerImageRegexp   string `long:"image-regexp" env:"image_regexp" description:"Filter events by image name (default to all)"`
+	TypeRegexp          string `long:"type-regexp" env:"type_regexp" description:"Filter events by type (default to all)"`
+	ContainerNameRegexp string `long:"container-name-regexp" env:"container_name_regexp" description:"Filter events by container name (default to all)"`
+	ActionRegexp        string `long:"action-regexp" env:"action_regexp" description:"Filter events by action (default to all)"`
 }
 
 func (o *options) Run(ctx context.Context) error {
@@ -27,11 +30,39 @@ func (o *options) Run(ctx context.Context) error {
 		}
 		eventFilter.ImageRegexp = r
 	}
+	if o.TypeRegexp != "" {
+		r, err := regexp.Compile(o.TypeRegexp)
+		if err != nil {
+			return fmt.Errorf("Invalid type-regexp: %s", err)
+		}
+		eventFilter.TypeRegexp = r
+	}
+	if o.ContainerNameRegexp != "" {
+		r, err := regexp.Compile(o.ContainerNameRegexp)
+		if err != nil {
+			return fmt.Errorf("Invalid container-regexp: %s", err)
+		}
+		eventFilter.ContainerNameRegexp = r
+	}
+	if o.DockerImageRegexp != "" {
+		r, err := regexp.Compile(o.DockerImageRegexp)
+		if err != nil {
+			return fmt.Errorf("Invalid image-regexp: %s", err)
+		}
+		eventFilter.ImageRegexp = r
+	}
+	if o.ActionRegexp != "" {
+		r, err := regexp.Compile(o.ActionRegexp)
+		if err != nil {
+			return fmt.Errorf("Invalid action-regexp: %s", err)
+		}
+		eventFilter.ActionRegexp = r
+	}
 	docker, err := client.NewEnvClient()
 	if err != nil {
 		return fmt.Errorf("Could not create a Docker client: %s", err)
 	}
-	if err := o.showVersion(ctx, docker); err != nil {
+	if err := o.showVersion(ctx, docker, eventFilter); err != nil {
 		return err
 	}
 	if err := o.showEvents(ctx, docker, eventFilter); err != nil {
@@ -40,13 +71,13 @@ func (o *options) Run(ctx context.Context) error {
 	return nil
 }
 
-func (o *options) showVersion(ctx context.Context, docker *client.Client) error {
+func (o *options) showVersion(ctx context.Context, docker *client.Client, filter formatter.EventFilter) error {
 	v, err := docker.ServerVersion(ctx)
 	if err != nil {
 		return fmt.Errorf("Could not get version from the Docker server: %s", err)
 	}
 	log.Printf("Connected to Docker server: %+v", v)
-	if err := slack.Send(o.Webhook, formatter.Version(v)); err != nil {
+	if err := slack.Send(o.Webhook, formatter.Version(v, filter)); err != nil {
 		return fmt.Errorf("Could not send a message to Slack: %s", err)
 	}
 	return nil

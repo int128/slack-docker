@@ -9,15 +9,32 @@ import (
 
 // EventFilter represents a filter for events.
 type EventFilter struct {
-	ImageRegexp *regexp.Regexp
+	ImageRegexp         *regexp.Regexp
+	TypeRegexp          *regexp.Regexp
+	ContainerNameRegexp *regexp.Regexp
+	ActionRegexp        *regexp.Regexp
 }
 
 // Match returns true if the event satisfies the filter.
 func (filter *EventFilter) Match(e events.Message) bool {
+	if filter.TypeRegexp != nil {
+		if !filter.TypeRegexp.MatchString(e.Type) {
+			return false
+		}
+	}
+	if filter.ActionRegexp != nil {
+		if !filter.ActionRegexp.MatchString(e.Action) {
+			return false
+		}
+	}
+	if filter.ContainerNameRegexp != nil {
+		if !filter.ContainerNameRegexp.MatchString(e.Actor.Attributes["name"]) {
+			return false
+		}
+	}
 	if filter.ImageRegexp != nil {
-		switch e.Type {
-		case "container":
-			return filter.ImageRegexp.MatchString(e.Actor.Attributes["image"])
+		if !filter.ImageRegexp.MatchString(e.Actor.Attributes["image"]) {
+			return false
 		}
 	}
 	return true
