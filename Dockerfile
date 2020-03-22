@@ -1,11 +1,10 @@
-FROM golang:1.11.1-alpine AS builder
-RUN apk update && apk add --no-cache git gcc musl-dev
+FROM golang:1.13.7-alpine AS builder
+ENV CGO_ENABLED=0
 WORKDIR /build
 COPY . .
 RUN go install -v
 
-FROM alpine
-RUN apk update && apk add --no-cache ca-certificates
+FROM alpine:3.11
 EXPOSE 3000
 COPY --from=builder /go/bin/slack-docker /
 CMD ["/slack-docker"]
