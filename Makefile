@@ -3,6 +3,7 @@ VERSION ?= latest
 GITHUB_USERNAME := int128
 GITHUB_REPONAME := slack-docker
 LDFLAGS := -X main.version=$(VERSION)
+OSARCH := linux_arm64 linux_amd64 darwin_amd64 windows_amd64
 
 $(TARGET):
 	go build -o $@ -ldflags "$(LDFLAGS)"
@@ -15,7 +16,7 @@ check:
 .PHONY: dist
 dist:
 	# make the zip files for GitHub Releases
-	VERSION=$(VERSION) CGO_ENABLED=0 goxzst -d dist -i "LICENSE" -o "$(TARGET)" -t "$(TARGET).rb" -- -ldflags "$(LDFLAGS)"
+	VERSION=$(VERSION) CGO_ENABLED=0 goxzst -d dist -i "LICENSE" -o "$(TARGET)" -t "$(TARGET).rb" -osarch "$(OSARCH)" -- -ldflags "$(LDFLAGS)"
 	# test the zip file
 	zipinfo dist/$(TARGET)_linux_amd64.zip
 
