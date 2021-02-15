@@ -1,7 +1,7 @@
 TARGET := slack-docker
 VERSION ?= latest
-GITHUB_USERNAME := int128
-GITHUB_REPONAME := slack-docker
+GITHUB_USERNAME ?= int128
+GITHUB_REPONAME ?= slack-docker
 LDFLAGS := -X main.version=$(VERSION)
 OSARCH := linux_arm64 linux_amd64 darwin_amd64 windows_amd64 linux_arm
 
