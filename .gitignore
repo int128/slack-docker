@@ -3,3 +3,6 @@
 /dist/
 
 /slack-docker
+
+# direnv file that sets directory-scoped environment variables; useful for testing the Makefile targets
+.envrc 
