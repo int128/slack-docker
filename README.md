@@ -29,7 +29,7 @@ You can run on Docker or Docker Compose as well.
 docker run -d -e webhook=https://hooks.slack.com/services/... -h "$(hostname)" -v /var/run/docker.sock:/var/run/docker.sock int128/slack-docker
 
 # Docker Compose
-curl -O https://raw.githubusercontent.com/int128/slack-docker/master/docker-compose.yml
+curl -O https://raw.githubusercontent.com/int128/slack-docker/master/docker/docker-compose.yml
 docker-compose up -d
 ```
 
