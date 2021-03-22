@@ -22,11 +22,11 @@ Run the command with the WebHook URL.
 slack-docker --webhook=https://hooks.slack.com/services/...
 ```
 
-You can run on Docker or Docker Compose as well.
+You can run the Docker image [`ghcr.io/int128/slack-docker`](https://ghcr.io/int128/slack-docker).
 
-```
+```sh
 # Docker
-docker run -d -e webhook=https://hooks.slack.com/services/... -h "$(hostname)" -v /var/run/docker.sock:/var/run/docker.sock int128/slack-docker
+docker run -d -e webhook=https://hooks.slack.com/services/... -h "$(hostname)" -v /var/run/docker.sock:/var/run/docker.sock ghcr.io/int128/slack-docker
 
 # Docker Compose
 curl -O https://raw.githubusercontent.com/int128/slack-docker/master/docker-compose.yml
