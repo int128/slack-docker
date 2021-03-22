@@ -11,6 +11,14 @@ on:
       - Dockerfile
     tags:
       - v*
+  pull_request:
+    branches:
+      - master
+    paths:
+      - .github/workflows/docker.yaml
+      - '**.go'
+      - go.*
+      - Dockerfile
 
 jobs:
   build-and-push:
@@ -24,4 +32,7 @@ jobs:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
           password: ${{ secrets.CR_PAT }}
+      - run: make docker-build
+        if: github.event_name == 'pull_request'
       - run: make docker-build-push
+        if: github.event_name == 'push'
