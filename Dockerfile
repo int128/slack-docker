@@ -1,10 +1,15 @@
-FROM golang:1.13.7-alpine AS builder
-ENV CGO_ENABLED=0
-WORKDIR /build
-COPY . .
-RUN go install -v
+FROM golang:1.16 as builder
 
-FROM alpine:3.11
-EXPOSE 3000
-COPY --from=builder /go/bin/slack-docker /
+WORKDIR /builder
+COPY go.* .
+RUN go mod download
+COPY Makefile .
+COPY main.go .
+COPY cmd cmd
+COPY formatter formatter
+ARG VERSION
+RUN make VERSION=$VERSION
+
+FROM gcr.io/distroless/base-debian10
+COPY --from=builder /builder/slack-docker /
 CMD ["/slack-docker"]
