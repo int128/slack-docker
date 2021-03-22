@@ -4,20 +4,7 @@ jobs:
     docker:
       - image: circleci/golang:1.13.7
     steps:
-      - run: mkdir -p ~/bin
-      - run: echo 'export PATH="$HOME/bin:$PATH"' >> $BASH_ENV
-      - run: curl -sfL https://install.goreleaser.com/github.com/golangci/golangci-lint.sh | sh -s -- -b ~/bin v1.21.0
-      - run: go get github.com/int128/goxzst
-      - run: |
-          curl -fL -o /tmp/ghcp.zip https://github.com/int128/ghcp/releases/download/v1.8.0/ghcp_linux_amd64.zip
-          unzip /tmp/ghcp.zip -d ~/bin
-      - checkout
-      - run: make check
-      - run: make dist
-      - run: |
-          if [ "$CIRCLE_TAG" ]; then
-            make VERSION="$CIRCLE_TAG" release
-          fi
+      - run: echo
 
 workflows:
   version: 2
@@ -26,5 +13,5 @@ workflows:
       - build:
           context: open-source
           filters:
-            tags:
-              only: /.*/
+            branches:
+              only: /^dummy$/
