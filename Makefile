@@ -41,16 +41,19 @@ DOCKER_REPOSITORY := ghcr.io/int128/slack-docker
 .PHONY: docker-build
 docker-build: Dockerfile
 	docker buildx build . \
-		--cache-from=type=registry,ref=$(DOCKER_REPOSITORY):latest \
+		--output=type=image,push=false \
+		--cache-from=type=local,src=/tmp/buildx \
+		--cache-to=type=local,mode=max,src=/tmp/buildx.new \
 		--platform=linux/amd64,linux/arm64
+	rm -fr /tmp/buildx
+	mv /tmp/buildx.new /tmp/buildx
 
 .PHONY: docker-build-push
 docker-build-push: Dockerfile
 	docker buildx build . \
 		--build-arg=VERSION=$(VERSION) \
 		--tag=$(DOCKER_REPOSITORY):$(VERSION) \
-		--cache-from=type=registry,ref=$(DOCKER_REPOSITORY):latest \
-		--cache-to=type=inline \
+		--cache-from=type=local,src=/tmp/buildx \
 		--platform=linux/amd64,linux/arm64 \
 		--push
 
