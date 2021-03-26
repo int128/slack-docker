@@ -43,7 +43,7 @@ docker-build: Dockerfile
 	docker buildx build . \
 		--output=type=image,push=false \
 		--cache-from=type=local,src=/tmp/buildx \
-		--cache-to=type=local,mode=max,src=/tmp/buildx.new \
+		--cache-to=type=local,mode=max,dest=/tmp/buildx.new \
 		--platform=linux/amd64,linux/arm64
 	rm -fr /tmp/buildx
 	mv /tmp/buildx.new /tmp/buildx
