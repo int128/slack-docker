@@ -2,11 +2,11 @@ TARGET := slack-docker
 TARGET_ARCHIVE := $(TARGET)_$(GOOS)_$(GOARCH).zip
 TARGET_DIGEST := $(TARGET)_$(GOOS)_$(GOARCH).zip.sha256
 
-# determine the version from ref
-ifeq ($(GITHUB_REF), refs/heads/master)
-  VERSION := latest
+# extract version from tag or default to latest
+ifeq ($(dir $(GITHUB_REF)), refs/tags/)
+  VERSION := $(notdir $(GITHUB_REF))
 else
-  VERSION ?= $(notdir $(GITHUB_REF))
+  VERSION := latest
 endif
 
 LDFLAGS := -X main.version=$(VERSION)
@@ -37,14 +37,16 @@ dist-release: dist
 	gh release upload $(VERSION) $(TARGET_ARCHIVE) $(TARGET_DIGEST) --clobber
 
 DOCKER_REPOSITORY := ghcr.io/int128/slack-docker
+DOCKER_PLATFORM := linux/amd64,linux/arm64
 
 .PHONY: docker-build
 docker-build: Dockerfile
 	docker buildx build . \
+		--build-arg=VERSION=$(VERSION) \
 		--output=type=image,push=false \
 		--cache-from=type=local,src=/tmp/buildx \
 		--cache-to=type=local,mode=max,dest=/tmp/buildx.new \
-		--platform=linux/amd64,linux/arm64
+		--platform=$(DOCKER_PLATFORM)
 	rm -fr /tmp/buildx
 	mv /tmp/buildx.new /tmp/buildx
 
@@ -54,7 +56,7 @@ docker-build-push: Dockerfile
 		--build-arg=VERSION=$(VERSION) \
 		--tag=$(DOCKER_REPOSITORY):$(VERSION) \
 		--cache-from=type=local,src=/tmp/buildx \
-		--platform=linux/amd64,linux/arm64 \
+		--platform=$(DOCKER_PLATFORM) \
 		--push
 
 .PHONY: clean
