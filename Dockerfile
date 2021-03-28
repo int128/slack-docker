@@ -7,8 +7,7 @@ COPY Makefile .
 COPY main.go .
 COPY cmd cmd
 COPY formatter formatter
-ARG VERSION
-RUN make VERSION=$VERSION
+RUN make
 
 FROM gcr.io/distroless/base-debian10
 COPY --from=builder /builder/slack-docker /
