@@ -9,6 +9,7 @@ on:
       - '**.go'
       - go.*
       - Dockerfile
+      - Makefile
     tags:
       - v*
   pull_request:
@@ -19,6 +20,7 @@ on:
       - '**.go'
       - go.*
       - Dockerfile
+      - Makefile
 
 jobs:
   build-and-push:
