@@ -39,27 +39,3 @@ dist-release: dist
 .PHONY: clean
 clean:
 	-rm $(TARGET)
-
-DOCKER_REPOSITORY := ghcr.io/int128/slack-docker
-DOCKER_PLATFORM := linux/amd64,linux/arm64
-
-.PHONY: docker-build
-docker-build: Dockerfile
-	docker buildx build . \
-		--build-arg=VERSION=$(VERSION) \
-		--platform=$(DOCKER_PLATFORM) \
-		--output=type=image,push=false \
-		--cache-from=type=local,src=/tmp/buildx \
-		--cache-to=type=local,mode=max,dest=/tmp/buildx
-
-.PHONY: docker-build-push
-docker-build-push: Dockerfile
-	docker buildx build . \
-		--push \
-		--build-arg=VERSION=$(VERSION) \
-		--platform=$(DOCKER_PLATFORM) \
-		--tag=$(DOCKER_REPOSITORY):$(VERSION) \
-		--cache-from=type=local,src=/tmp/buildx \
-		--cache-to=type=local,mode=max,dest=/tmp/buildx.new
-	rm -fr /tmp/buildx
-	mv /tmp/buildx.new /tmp/buildx

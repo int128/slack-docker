@@ -40,7 +40,6 @@ jobs:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      - run: make docker-build
-        if: github.event_name == 'pull_request'
-      - run: make docker-build-push
-        if: github.event_name == 'push'
+      - uses: int128/buildx-push-action@v1
+        with:
+          extra-args: --platform=linux/amd64,linux/arm64
