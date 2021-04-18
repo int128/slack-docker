@@ -1,12 +1,18 @@
-TARGET := slack-docker
-TARGET_ARCHIVE := $(TARGET)_$(GOOS)_$(GOARCH).zip
-TARGET_DIGEST := $(TARGET)_$(GOOS)_$(GOARCH).zip.sha256
+PRODUCT := slack-docker
+TARGET_ARCHIVE := $(PRODUCT)_$(GOOS)_$(GOARCH).zip
+TARGET_DIGEST := $(PRODUCT)_$(GOOS)_$(GOARCH).zip.sha256
 
-# extract version from tag or default to latest
-ifeq ($(dir $(GITHUB_REF)), refs/tags/)
-  VERSION := $(notdir $(GITHUB_REF))
+ifeq ($(GOOS), windows)
+  TARGET := $(PRODUCT).exe
 else
+  TARGET := $(PRODUCT)
+endif
+
+# determine the version from ref
+ifeq ($(GITHUB_REF), refs/heads/master)
   VERSION := latest
+else
+  VERSION ?= $(notdir $(GITHUB_REF))
 endif
 
 LDFLAGS := -X main.version=$(VERSION)
