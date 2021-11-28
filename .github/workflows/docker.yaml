@@ -9,7 +9,6 @@ on:
       - '**.go'
       - go.*
       - Dockerfile
-      - Makefile
     tags:
       - v*
   pull_request:
@@ -20,26 +19,32 @@ on:
       - '**.go'
       - go.*
       - Dockerfile
-      - Makefile
 
 jobs:
-  build-and-push:
+  build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: docker/setup-qemu-action@v1
-      - uses: docker/setup-buildx-action@v1
-      - uses: actions/cache@v2
+      - uses: docker/metadata-action@v3
+        id: metadata
         with:
-          path: /tmp/buildx
-          key: buildx-${{ runner.os }}-${{ github.sha }}
-          restore-keys: |
-            buildx-${{ runner.os }}-
+          images: ghcr.io/${{ github.repository }}
+      - uses: int128/docker-build-cache-config-action@v1
+        id: cache
+        with:
+          image: ghcr.io/${{ github.repository }}/cache
       - uses: docker/login-action@v1
         with:
           registry: ghcr.io
-          username: ${{ github.repository_owner }}
+          username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      - uses: int128/buildx-push-action@v1
+      - uses: docker/setup-qemu-action@v1
+      - uses: docker/setup-buildx-action@v1
+      - uses: docker/build-push-action@v2
         with:
-          extra-args: --platform=linux/amd64,linux/arm64,linux/arm/v7
+          push: ${{ github.event_name == 'push' }}
+          tags: ${{ steps.metadata.outputs.tags }}
+          labels: ${{ steps.metadata.outputs.labels }}
+          cache-from: ${{ steps.cache.outputs.cache-from }}
+          cache-to: ${{ steps.cache.outputs.cache-to }}
+          platforms: linux/amd64,linux/arm64,linux/arm/v7
