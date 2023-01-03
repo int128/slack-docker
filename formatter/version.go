@@ -2,7 +2,7 @@ package formatter
 
 import (
 	"fmt"
-	"github.com/moby/moby/api/types"
+	"github.com/docker/docker/api/types"
 	"github.com/int128/slack"
 )
 
