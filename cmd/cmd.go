@@ -7,8 +7,8 @@ import (
 	"log"
 	"regexp"
 
-	"github.com/docker/docker/api/types"
-	"github.com/docker/docker/client"
+	"github.com/moby/moby/api/types"
+	"github.com/moby/moby/client"
 	"github.com/int128/slack"
 	"github.com/int128/slack-docker/formatter"
 	"github.com/jessevdk/go-flags"

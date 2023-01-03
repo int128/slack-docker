@@ -2,7 +2,7 @@ package formatter
 
 import (
 	"fmt"
-	"github.com/docker/docker/api/types/events"
+	"github.com/moby/moby/api/types/events"
 	"regexp"
 	"testing"
 )
