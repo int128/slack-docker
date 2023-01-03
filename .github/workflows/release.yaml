@@ -11,8 +11,6 @@ on:
     tags:
       - v*
   pull_request:
-    branches:
-      - master
     paths:
       - .github/workflows/release.yaml
       - '**.go'
@@ -49,9 +47,10 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v2
-      - uses: int128/go-actions/setup@v1
+      - uses: actions/setup-go@v3
         with:
           go-version: 1.18.1
+          cache: true
       - run: go build -ldflags "-X main.version=${GITHUB_REF##*/}"
       - uses: int128/go-actions/release@v1
         with:
