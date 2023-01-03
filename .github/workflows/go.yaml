@@ -9,8 +9,6 @@ on:
       - '**.go'
       - go.*
   pull_request:
-    branches:
-      - master
     paths:
       - .github/workflows/go.yaml
       - '**.go'
