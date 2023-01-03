@@ -22,20 +22,34 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v2
-      - uses: int128/go-actions/setup@v1
+      - uses: actions/setup-go@v3
         with:
           go-version: 1.18.1
+          cache: true
       - uses: golangci/golangci-lint-action@v3
         with:
           version: v1.45.2
           args: --timeout=3m
+
+  tidy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-go@v3
+        with:
+          go-version: 1.18.1
+          cache: true
+      - run: go mod tidy
+      - uses: int128/update-generated-files-action@v2
 
   test:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v2
-      - uses: int128/go-actions/setup@v1
+      - uses: actions/setup-go@v3
         with:
           go-version: 1.18.1
+          cache: true
       - run: go test -v -race ./...
