@@ -48,7 +48,7 @@ func (o *options) Run(ctx context.Context) error {
 		}
 		eventFilter.ImageRegexp = r
 	}
-	docker, err := client.NewEnvClient()
+	docker, err := client.NewClientWithOpts(client.FromEnv)
 	if err != nil {
 		return fmt.Errorf("Could not create a Docker client: %s", err)
 	}
