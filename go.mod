@@ -3,15 +3,14 @@ module github.com/int128/slack-docker
 go 1.18
 
 require (
+	github.com/docker/docker v20.10.22+incompatible
 	github.com/int128/slack v1.5.0
 	github.com/jessevdk/go-flags v1.5.0
-	github.com/moby/moby v20.10.22+incompatible
 )
 
 require (
 	github.com/Microsoft/go-winio v0.4.14 // indirect
 	github.com/docker/distribution v2.7.1+incompatible // indirect
-	github.com/docker/docker v20.10.22+incompatible // indirect
 	github.com/docker/go-connections v0.4.0 // indirect
 	github.com/docker/go-units v0.4.0 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
