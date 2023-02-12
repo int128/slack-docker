@@ -1,6 +1,7 @@
 {
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
     "github>int128/renovate-base",
-    "github>int128/go-actions",
+    "github>int128/go-renovate-config",
   ],
 }
