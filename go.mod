@@ -3,7 +3,7 @@ module github.com/int128/slack-docker
 go 1.18
 
 require (
-	github.com/docker/docker v20.10.24+incompatible
+	github.com/docker/docker v20.10.25+incompatible
 	github.com/int128/slack v1.5.0
 	github.com/jessevdk/go-flags v1.5.0
 )
