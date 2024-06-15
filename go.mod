@@ -5,7 +5,7 @@ go 1.18
 require (
 	github.com/docker/docker v20.10.27+incompatible
 	github.com/int128/slack v1.5.0
-	github.com/jessevdk/go-flags v1.5.0
+	github.com/jessevdk/go-flags v1.6.1
 )
 
 require (
@@ -22,7 +22,7 @@ require (
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/sirupsen/logrus v1.4.1 // indirect
 	golang.org/x/net v0.0.0-20201021035429-f5854403a974 // indirect
-	golang.org/x/sys v0.1.0 // indirect
+	golang.org/x/sys v0.21.0 // indirect
 	golang.org/x/time v0.3.0 // indirect
 	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
 	gotest.tools/v3 v3.4.0 // indirect
